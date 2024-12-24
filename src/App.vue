@@ -1,13 +1,8 @@
-<script setup>
-import { useRoute } from 'vue-router'
-
-const route = useRoute()
-const hideNavbarOn = ['/products'] // Add routes where navbar should be hidden
-</script>
+<script setup></script>
 
 <template>
   <div class="app">
-    <nav v-if="!hideNavbarOn.includes(route.path)" class="navbar">
+    <nav class="navbar">
       <router-link to="/" class="logo">ArtGallery</router-link>
       <div class="nav-links">
         <router-link to="/">Home</router-link>

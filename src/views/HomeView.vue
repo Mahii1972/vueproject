@@ -61,6 +61,7 @@
         one. Each purchase supports our artists and helps keep these traditional art forms alive.
       </p>
       <button
+        @click="navigateToProducts"
         class="bg-white text-red-700 hover:bg-yellow-200 py-3 px-8 rounded-lg font-semibold transition-all duration-300"
       >
         Explore Gallery
@@ -75,6 +76,9 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 const featuredArtworks = [
   {
     title: 'Divine Krishna',
@@ -116,6 +120,10 @@ const featuredArtworks = [
     type: 'Fineliner Art',
   },
 ]
+
+const navigateToProducts = () => {
+  router.push('/products')
+}
 </script>
 
 <style scoped>
