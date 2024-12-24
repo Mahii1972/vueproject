@@ -3,7 +3,9 @@
 <template>
   <div class="app">
     <nav class="navbar">
-      <router-link to="/" class="logo">ArtGallery</router-link>
+      <router-link to="/" class="logo">
+        <img src="/AAAlogo.png" alt="Apoorva Art Works Logo" class="h-12" />
+      </router-link>
       <div class="nav-links">
         <router-link to="/">Home</router-link>
         <router-link to="/products">Products</router-link>
@@ -63,9 +65,8 @@ body {
 }
 
 .logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #ffffff; /* Changed to white to match HomeView's text */
+  display: flex;
+  align-items: center;
   text-decoration: none;
 }
 
