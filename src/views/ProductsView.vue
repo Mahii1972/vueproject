@@ -6,7 +6,7 @@
     >
       <h1 class="text-6xl mb-5 font-serif animate-fade-in-down text-white">Our Art Collection</h1>
       <p class="text-xl animate-fade-in-up text-white">
-        Discover Unique Artworks from Apoorva's Collection
+        Discover Unique Artworks from Ryan's Collection
       </p>
     </div>
 
@@ -20,27 +20,57 @@
       />
     </div>
 
-    <!-- Products Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 py-5">
+    <!-- Loading State -->
+    <div v-if="isLoading" class="text-center py-8">
       <div
-        v-for="(product, index) in filteredProducts"
-        :key="index"
+        class="animate-spin h-12 w-12 mx-auto border-4 border-yellow-500 rounded-full border-t-transparent"
+      ></div>
+      <p class="mt-4 text-gray-400">Loading artworks...</p>
+    </div>
+
+    <!-- Error State -->
+    <div v-else-if="error" class="text-center py-8 text-red-500">
+      {{ error }}
+    </div>
+
+    <!-- Products Grid -->
+    <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 py-5">
+      <div
+        v-for="artwork in filteredArtworks"
+        :key="artwork.id"
         class="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
       >
-        <img :src="product.image" :alt="product.title" class="w-full h-[300px] object-cover" />
+        <img :src="artwork.image_url" :alt="artwork.title" class="w-full h-[300px] object-cover" />
         <div class="p-5">
-          <h3 class="text-xl font-semibold mb-2 text-yellow-400">{{ product.title }}</h3>
-          <p class="text-gray-400 my-2">by {{ product.artist }}</p>
-          <p class="font-bold text-yellow-500 my-2">{{ product.price }}</p>
-          <p class="text-sm italic text-gray-500 mb-4">{{ product.type }}</p>
+          <h3 class="text-xl font-semibold mb-2 text-yellow-400">{{ artwork.title }}</h3>
+          <p class="text-gray-400 my-2">by {{ artwork.artist_name }}</p>
+          <p class="font-bold text-yellow-500 my-2">${{ artwork.price }}</p>
+          <p class="text-sm italic text-gray-500 mb-2">{{ artwork.medium }}</p>
+          <p class="text-sm text-gray-500 mb-4">{{ artwork.dimensions }}</p>
+          <p v-if="artwork.description" class="text-sm text-gray-400 mb-4 line-clamp-3">
+            {{ artwork.description }}
+          </p>
           <button
+            v-if="artwork.status === 'available'"
             class="w-full py-3 px-4 bg-yellow-600 text-white rounded-lg transition-colors duration-300 hover:bg-yellow-700"
           >
             Add to Cart
           </button>
+          <p
+            v-else-if="artwork.status === 'sold'"
+            class="w-full py-3 px-4 bg-gray-700 text-gray-400 rounded-lg text-center"
+          >
+            Sold
+          </p>
         </div>
       </div>
     </div>
+
+    <!-- Empty State -->
+    <div v-if="!isLoading && !error && filteredArtworks.length === 0" class="text-center py-8">
+      <p class="text-gray-400">No artworks found matching your search.</p>
+    </div>
+
     <!-- Footer -->
     <footer class="mt-16 py-8 text-center text-gray-500">
       © {{ new Date().getFullYear() }} Art Collection. All Rights Reserved.
@@ -49,82 +79,47 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { supabase } from '@/lib/supabaseClient'
 
 const searchQuery = ref('')
+const artworks = ref([])
+const isLoading = ref(true)
+const error = ref(null)
 
-const products = [
-  {
-    title: 'Sunset Dreams',
-    artist: 'Emma Johnson',
-    price: '$450',
-    image: 'https://picsum.photos/300/400?random=1',
-    type: 'Oil Painting',
-  },
-  {
-    title: 'Ocean Waves',
-    artist: 'Michael Chen',
-    price: '$680',
-    image: 'https://picsum.photos/300/400?random=2',
-    type: 'Watercolor',
-  },
-  {
-    title: 'Mountain Serenity',
-    artist: 'Sarah Williams',
-    price: '$750',
-    image: 'https://picsum.photos/300/400?random=3',
-    type: 'Acrylic Painting',
-  },
-  {
-    title: 'City Lights',
-    artist: 'David Miller',
-    price: '$890',
-    image: 'https://picsum.photos/300/400?random=4',
-    type: 'Digital Art',
-  },
-  {
-    title: 'Forest Mystery',
-    artist: 'Lisa Anderson',
-    price: '$560',
-    image: 'https://picsum.photos/300/400?random=5',
-    type: 'Mixed Media',
-  },
-  {
-    title: 'Desert Dawn',
-    artist: 'James Wilson',
-    price: '$640',
-    image: 'https://picsum.photos/300/400?random=6',
-    type: 'Pastel Drawing',
-  },
-  {
-    title: 'Abstract Harmony',
-    artist: 'Sophie Lee',
-    price: '$720',
-    image: 'https://picsum.photos/300/400?random=7',
-    type: 'Abstract Painting',
-  },
-  {
-    title: 'Floral Elegance',
-    artist: 'Emily Carter',
-    price: '$550',
-    image: 'https://picsum.photos/300/400?random=8',
-    type: 'Watercolor',
-  },
-  {
-    title: 'Urban Rhythm',
-    artist: 'Alex Thompson',
-    price: '$830',
-    image: 'https://picsum.photos/300/400?random=9',
-    type: 'Street Art',
-  },
-]
+const fetchArtworks = async () => {
+  try {
+    isLoading.value = true
+    error.value = null
 
-const filteredProducts = computed(() => {
-  return products.filter(
-    (product) =>
-      product.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      product.artist.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      product.type.toLowerCase().includes(searchQuery.value.toLowerCase()),
+    const { data, error: err } = await supabase
+      .from('artworks')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (err) throw err
+
+    artworks.value = data
+  } catch (err) {
+    console.error('Error fetching artworks:', err)
+    error.value = 'Failed to load artworks. Please try again later.'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchArtworks()
+})
+
+const filteredArtworks = computed(() => {
+  const query = searchQuery.value.toLowerCase()
+  return artworks.value.filter(
+    (artwork) =>
+      artwork.title.toLowerCase().includes(query) ||
+      artwork.artist_name.toLowerCase().includes(query) ||
+      artwork.medium.toLowerCase().includes(query) ||
+      (artwork.description && artwork.description.toLowerCase().includes(query)),
   )
 })
 </script>

@@ -4,7 +4,7 @@
   <div class="app">
     <nav class="navbar">
       <router-link to="/" class="logo">
-        <img src="/AAAlogo.png" alt="Apoorva Art Works Logo" class="h-12" />
+        <img src="/AAAlogo.png" alt="Ryan Art Works Logo" class="h-12" />
       </router-link>
       <div class="nav-links">
         <router-link to="/">Home</router-link>

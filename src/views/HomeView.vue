@@ -4,7 +4,7 @@
     <div
       class="text-center py-16 px-5 bg-gradient-to-br from-yellow-600 to-red-800 rounded-xl mb-10 shadow-lg transform hover:scale-105 transition-all duration-300"
     >
-      <h1 class="text-6xl mb-5 font-serif animate-fade-in-down text-white">Apoorva Art Works</h1>
+      <h1 class="text-6xl mb-5 font-serif animate-fade-in-down text-white">Ryan Art Works</h1>
       <p class="text-xl animate-fade-in-up text-white">
         Where Tradition Meets Artistry: Exquisite Hand-drawn and Tanjore Paintings
       </p>
@@ -13,10 +13,10 @@
     <!-- About Us Section -->
     <div class="mt-10 max-w-4xl mx-auto">
       <h2 class="text-center mb-8 text-3xl font-serif text-yellow-500">
-        Discover the World of Apoorva Art Works
+        Discover the World of Ryan Art Works
       </h2>
       <p class="text-lg mb-6 animate-fade-in">
-        Welcome to Apoorva Art Works, a treasure trove of handcrafted beauty. We specialize in two
+        Welcome to Ryan Art Works, a treasure trove of handcrafted beauty. We specialize in two
         distinct yet equally captivating art forms:
         <span class="font-bold">vibrant hand-drawn paintings</span> (using fineliners and other
         mediums) and the <span class="font-bold">opulent art of Tanjore painting</span>. Our artists
@@ -70,7 +70,7 @@
 
     <!-- Footer (Optional) -->
     <footer class="mt-16 py-8 text-center text-gray-500">
-      © {{ new Date().getFullYear() }} Apoorva Art Works. All Rights Reserved.
+      © {{ new Date().getFullYear() }} Ryan Art Works. All Rights Reserved.
     </footer>
   </div>
 </template>
