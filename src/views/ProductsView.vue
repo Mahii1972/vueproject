@@ -53,8 +53,9 @@
           <button
             v-if="artwork.status === 'available'"
             class="w-full py-3 px-4 bg-yellow-600 text-white rounded-lg transition-colors duration-300 hover:bg-yellow-700"
+            @click="openBuyModal(artwork)"
           >
-            Add to Cart
+            Buy Now
           </button>
           <p
             v-else-if="artwork.status === 'sold'"
@@ -63,6 +64,39 @@
             Sold
           </p>
         </div>
+      </div>
+    </div>
+
+    <!-- Email Collection Modal -->
+    <div
+      v-if="showModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
+    >
+      <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full">
+        <h2 class="text-xl font-semibold mb-4 text-yellow-400">Enter Your Email</h2>
+        <input
+          type="email"
+          v-model="userEmail"
+          placeholder="your@email.com"
+          class="w-full px-4 py-2 mb-4 border-2 border-gray-700 rounded-lg bg-gray-900 text-white focus:outline-none focus:border-yellow-500"
+        />
+        <div class="flex gap-3">
+          <button
+            @click="handlePurchase"
+            class="flex-1 py-2 px-4 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700"
+            :disabled="isSubmitting"
+          >
+            {{ isSubmitting ? 'Sending...' : 'Submit' }}
+          </button>
+          <button
+            @click="closeModal"
+            class="flex-1 py-2 px-4 bg-gray-700 text-white rounded-lg hover:bg-gray-600"
+          >
+            Cancel
+          </button>
+        </div>
+        <p v-if="submitError" class="mt-3 text-red-500 text-sm">{{ submitError }}</p>
+        <p v-if="successMessage" class="mt-3 text-green-500 text-sm">{{ successMessage }}</p>
       </div>
     </div>
 
@@ -86,6 +120,72 @@ const searchQuery = ref('')
 const artworks = ref([])
 const isLoading = ref(true)
 const error = ref(null)
+
+// Modal state
+const showModal = ref(false)
+const userEmail = ref('')
+const selectedArtwork = ref(null)
+const isSubmitting = ref(false)
+const submitError = ref(null)
+const successMessage = ref('')
+
+const openBuyModal = (artwork) => {
+  selectedArtwork.value = artwork
+  showModal.value = true
+  userEmail.value = ''
+  submitError.value = null
+  successMessage.value = ''
+}
+
+const closeModal = () => {
+  showModal.value = false
+  selectedArtwork.value = null
+  userEmail.value = ''
+  submitError.value = null
+  successMessage.value = ''
+}
+
+const handlePurchase = async () => {
+  if (!userEmail.value) {
+    submitError.value = 'Please enter your email'
+    return
+  }
+
+  try {
+    isSubmitting.value = true
+    submitError.value = null
+    successMessage.value = ''
+
+    const response = await fetch('http://localhost:8080/send-product', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        product_name: selectedArtwork.value.title,
+        price: selectedArtwork.value.price,
+        description: selectedArtwork.value.description || '',
+        email: userEmail.value,
+      }),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new Error('Failed to send purchase details')
+    }
+
+    successMessage.value = data.message
+    setTimeout(() => {
+      closeModal()
+    }, 2000) // Close modal after 2 seconds
+  } catch (err) {
+    console.error('Error sending purchase details:', err)
+    submitError.value = 'Failed to process purchase. Please try again.'
+  } finally {
+    isSubmitting.value = false
+  }
+}
 
 const fetchArtworks = async () => {
   try {
