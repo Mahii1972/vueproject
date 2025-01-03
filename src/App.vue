@@ -4,7 +4,7 @@
   <div class="app">
     <nav class="navbar">
       <router-link to="/" class="logo">
-        <img src="/AAAlogo.png" alt="Ryan Art Works Logo" class="h-12" />
+        <span class="text-white text-2xl font-bold">Ryan Art Works</span>
       </router-link>
       <div class="nav-links">
         <router-link to="/">Home</router-link>
