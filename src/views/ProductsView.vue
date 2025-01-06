@@ -156,7 +156,7 @@ const handlePurchase = async () => {
     submitError.value = null
     successMessage.value = ''
 
-    const response = await fetch('http://localhost:8080/send-product', {
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/send-product`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
